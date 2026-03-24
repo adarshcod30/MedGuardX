@@ -7,7 +7,7 @@ services:
     repo: https://github.com/adarshcod30/MedGuardX.git
     branch: main
     rootDir: backend
-    buildCommand: "pip install -r requirements.txt && python -m spacy download en_core_web_lg"
+    buildCommand: "pip install -r requirements.txt && python -m spacy download en_core_web_sm"
     startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: PYTHON_VERSION
