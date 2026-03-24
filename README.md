@@ -1,4 +1,4 @@
-# MedGuardX 🛡️ -> Healthcare Data Protection System
+# MedGuardX - Healthcare Data Protection System
 
 MedGuardX is a complete, independent healthcare data protection system designed to fundamentally change how sensitive medical data is ingested, stored, and shared. 
 
@@ -6,7 +6,7 @@ Unlike basic redaction tools, MedGuardX functions as an intelligent data vault a
 
 ---
 
-## 🌟 Novelty & Key Differentiators
+##  Novelty & Key Differentiators
 
 What makes MedGuardX stand out against standard healthcare systems?
 1. **Dynamic Context-Aware Masking**: Data is not just "masked" permanently in the database. Instead, raw data is heavily encrypted at rest. When retrieved, it passes through an intelligent Policy Engine where the `(Role × Purpose × Patient Consent)` matrix determines exactly *how* the data should look.
@@ -16,7 +16,7 @@ What makes MedGuardX stand out against standard healthcare systems?
 
 ---
 
-## 🛠️ Tech Stack & Modules Used
+##  Tech Stack & Modules Used
 
 ### **Frontend layer**
 - **Framework**: Next.js 14, React 18
@@ -36,7 +36,7 @@ What makes MedGuardX stand out against standard healthcare systems?
 
 ---
 
-## 🎯 Features
+##  Features
 
 - **RBAC & Purpose-Based Retrieval**: Define retrieval intent (Treatment, Research, Billing, Legal) mapped directly to your user role (Doctor, Nurse, Researcher, Company). 
 - **Patient Consent Toggles**: Security rules dynamically tighten or ease depending on explicit Patient Consent checks during data retrieval.
@@ -46,7 +46,7 @@ What makes MedGuardX stand out against standard healthcare systems?
 
 ---
 
-## 📐 High-Level Full Architecture
+##  High-Level Full Architecture
 
 ```mermaid
 graph TD
@@ -81,7 +81,7 @@ graph TD
 
 ---
 
-## 🧠 Low-Level Design & Workflow
+##  Low-Level Design & Workflow
 
 ```mermaid
 flowchart LR
@@ -129,7 +129,7 @@ sequenceDiagram
 
 ---
 
-## 🔌 API Endpoints Detailed
+##  API Endpoints Detailed
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
@@ -143,7 +143,7 @@ sequenceDiagram
 
 ---
 
-## 🚀 How to Run It
+##  How to Run It
 
 ### Prerequisites
 - Node.js 18+
@@ -171,7 +171,7 @@ The application will be available at `http://localhost:3000`.
 
 ---
 
-## 💡 How to Use It (Examples & Feature Matching)
+##  How to Use It (Examples & Feature Matching)
 
 **1. Creating an Account & Dashboard**
 - Go to `/login` (via UI Auth tab). Register an account (e.g., select **Doctor**) and log in.
