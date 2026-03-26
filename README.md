@@ -1,60 +1,78 @@
-# 🛡️ MedGuardX: Healthcare Data Protection System
-### *Zero-Knowledge Data Vault & Context-Aware Masking Engine*
+<div align="center">
 
-MedGuardX is a state-of-the-art healthcare data protection suite designed to fundamentally transform how sensitive medical data is ingested, stored, and shared. Unlike standard redaction tools, MedGuardX functions as an **Intelligent Security Gateway**, handling structured HL7 data, unstructured clinical notes, and medical images through advanced AI-PII detection and context-specific security policies.
+# 🛡️ MedGuardX
+### *Healthcare Data Protection & Context-Aware Masking System*
+
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-05998b?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 
 🚀 **Live Deployment**: [med-guard-x.vercel.app](https://med-guard-x.vercel.app/)
 
+</div>
+
 ---
 
-## 📸 Snapshot Overview
+## 📖 Overview
 
+MedGuardX is a complete healthcare data protection system designed to fundamentally change how sensitive medical data is ingested, stored, and shared. It functions as an **intelligent data vault** and **context-aware masking engine**, detecting PII/PHI (Personally Identifiable Information / Protected Health Information) and dynamically applying security policies.
+
+### ✨ Key Differentiators
+- **Dynamic Context-Aware Masking**: Evaluates the `(Role × Purpose × Patient Consent)` matrix in real-time.
+- **Multi-Format Ingestion**: Supports raw text, HL7 messages, PDFs, and scanned images (Tesseract OCR).
+- **AI-PII Detection**: Powered by Microsoft Presidio & spaCy with native support for Indian identifiers (Aadhaar/PAN).
+- **Indelible Audit Trails**: Chronological tracking of every access attempt for complete accountability.
+
+---
+
+## 📸 Core Capabilities & Showcase
+
+### 1. Intelligent Dashboard
+Real-time security telemetry and high-level statistics for your healthcare data ecosystem.
 ![Dashboard Overview](docs/screenshots/dashboard.png)
-*Professional healthcare analytics dashboard with real-time security telemetry.*
+
+### 2. Multi-Format Secure Upload
+Supports HL7, PDF, PNG, JPG, and TXT. Tesseract OCR processes images to extract and protect clinical data.
+![Upload Screen](docs/screenshots/upload.png)
+
+### 3. Contextual Data Retrieval
+Paste a Patient UUID and define your context. Masking is applied instantly based on user roles and patient consent.
+![Retrieve Screen](docs/screenshots/retrieve.png)
+
+### 4. Immutable Access Audit
+A transparent chain of accountability tracking every denied and permitted access event.
+![Audit Screen](docs/screenshots/audit.png)
 
 ---
 
-## 🔥 Key Differentiators
+## 📂 Project Structure
 
-| Feature | Description | Benefit |
-| :--- | :--- | :--- |
-| **Dynamic Context Masking** | Evaluates `(Role × Purpose × Patient Consent)` matrix in real-time. | Ensures zero data leakage for unauthorized roles. |
-| **Multi-Format Ingestion** | Supports raw text, HL7 messages, PDFs, and scanned images (OCR). | Universal medical data compatibility. |
-| **AI-PII Recognition** | Powered by Microsoft Presidio & spaCy Transformers. | Native support for global and Indian identifiers (Aadhaar/PAN). |
-| **Immutable Audit Log** | Chronological tracking of every access attempt (Allowed/Denied). | Guaranteed compliance and accountability. |
-
----
-
-## 🛠️ Technology Stack
-
-<details>
-<summary><b>Frontend Layer (Next.js 14)</b></summary>
-<ul>
-  <li><b>Framework</b>: Next.js 14 (App Router)</li>
-  <li><b>UI/UX</b>: Tailwind CSS, Framer Motion (Glassmorphism & Micro-interactions)</li>
-  <li><b>Icons</b>: Lucide React</li>
-  <li><b>Language</b>: TypeScript</li>
-</ul>
-</details>
-
-<details>
-<summary><b>Backend Core (FastAPI)</b></summary>
-<ul>
-  <li><b>API</b>: FastAPI & Uvicorn (Asynchronous Python)</li>
-  <li><b>Security</b>: Fernet (AES-256) Encryption & JWT Auth</li>
-  <li><b>NLP Engine</b>: Microsoft Presidio & `en_core_web_lg` spaCy models</li>
-  <li><b>Database</b>: SQLite (Relational Storage)</li>
-</ul>
-</details>
-
-<details>
-<summary><b>Data Processing Modules</b></summary>
-<ul>
-  <li><b>OCR</b>: Tesseract-OCR & Pillow</li>
-  <li><b>PDF Extraction</b>: pdfplumber</li>
-  <li><b>Medical Syntax</b>: hl7apy</li>
-</ul>
-</details>
+```text
+.
+├── backend
+│   ├── app
+│   │   ├── auth.py          # JWT & Authentication logic
+│   │   ├── database.py      # SQLAlchemy/SQLite session mgmt
+│   │   ├── main.py          # FastAPI application entry
+│   │   ├── models.py        # Database schema definitions
+│   │   ├── routes/          # API endpoint controllers
+│   │   └── services/        # PII Detection & Encryption logic
+│   ├── medguardx.db         # Local encrypted store
+│   └── requirements.txt     # Python dependencies
+├── docs
+│   └── screenshots/         # UI visual assets
+├── frontend
+│   ├── public/              # Static assets
+│   ├── src
+│   │   ├── app/             # Next.js App Router pages
+│   │   ├── components/      # Reusable UI components
+│   │   └── lib/             # API clients & utilities
+│   ├── tailwind.config.ts   # UI Theme configurations
+│   └── tsconfig.json        # TypeScript configuration
+└── README.md                # Project documentation
+```
 
 ---
 
@@ -121,23 +139,7 @@ sequenceDiagram
 
 ---
 
-## ⚡ Core Modules & Showcase
-
-### 1. Multi-Format Secure Uploads
-Drag & drop medical records. MedGuardX automatically detects the file type and routes it through the appropriate ingestion engine.
-![Upload Screen](docs/screenshots/upload.png)
-
-### 2. Context-Aware Data Retrieval
-Paste a Patient UUID and define your context. Based on your role and the patient's consent, the data is dynamically masked.
-![Retrieve Screen](docs/screenshots/retrieve.png)
-
-### 3. Transparent Compliance Auditing
-Every interaction is logged. This ensures complete transparency for regulatory bodies like GDPR, HIPAA, and DPDP.
-![Audit Screen](docs/screenshots/audit.png)
-
----
-
-## 🚀 Getting Started
+## 🚀 Installation & Setup
 
 ### Prerequisites
 - Node.js 18+
@@ -160,15 +162,14 @@ cd frontend
 npm install
 npm run dev
 ```
-The app will be live at `http://localhost:3000`.
 
 ---
 
-## 🛡️ Compliance Standards
-MedGuardX is built with a **Privacy-by-Design** philosophy, adhering to:
-- ✅ **DPDP Act (India)**: Native PII/PHI detection for Aadhaar/PAN.
-- ✅ **GDPR**: Right to be forgotten and data minimization.
-- ✅ **IT Act 2000**: Robust encryption standards (AES-256).
+## 🛡️ Compliance & Standards
+MedGuardX is built with a **Privacy-by-Design** philosophy, adhering to global and local healthcare regulations:
+- ✅ **DPDP Act (India)**: Native PII/PHI detection for Aadhaar/PAN cards.
+- ✅ **GDPR**: Implements data minimization and purpose-based access.
+- ✅ **IT Act 2000**: Robust encryption for data at rest (AES-256).
 
 ---
 
@@ -176,4 +177,4 @@ MedGuardX is built with a **Privacy-by-Design** philosophy, adhering to:
 MedGuardX is licensed under the MIT License. See `LICENSE` for more details.
 
 ---
-*Built for the future of secure healthcare by Adarsh.*
+*Built with ❤️ for secure healthcare by Adarsh.*
