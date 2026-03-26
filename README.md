@@ -21,6 +21,12 @@ MedGuardX is a state-of-the-art, independent healthcare data protection suite de
 
 Unlike basic redaction tools, MedGuardX functions as an **Intelligent Security Gateway** and **Data Vault**. It handles structured HL7 data, unstructured clinical notes, PDFs, and medical images (through advanced OCR) by detecting PII/PHI (Personally Identifiable Information / Protected Health Information) and dynamically applying context-specific security policies *before* data is ever exposed to a user.
 
+### 🚩 The Problem
+Healthcare organizations are sitting on massive amounts of unstructured data (clinical notes, PDFs, X-rays). Sharing this data for research, billing, or legal reasons is a nightmare because PII and PHI are deeply embedded. Manual redaction is slow and error-prone, while standard regex tools fail to understand the context of medical jargon, leading to catastrophic data leaks or over-redaction.
+
+### 💡 The Solution
+MedGuardX acts as an inviolable proxy between your raw healthcare data and the end-user. When data is ingested, our AI pipeline instantly detects and isolates PII/PHI, encrypting the raw text with AES-256 before it ever hits the database. When a user requests data, the system doesn't just decrypt it—it evaluates a real-time policy matrix determining who they are, why they need it, and if the patient consented. The output is a dynamically masked document tailored exactly to their authorization level.
+
 ---
 
 ## 📸 Snapshot Overview
@@ -42,34 +48,47 @@ What makes MedGuardX stand out against standard healthcare systems?
 
 ---
 
-## 🛠️ Technology Stack & Modules Used
+## ⚙️ How It Works: The Detailed Backend Workflow
+
+To understand the core power of MedGuardX, here is the exact execution logic happens under the hood when data enters the system:
+
+1. **Multi-Modal Ingestion Mapping**: The FastAPI backend securely receives the payload. If it's an image, **Tesseract OCR** extracts the textual layer. If it's a PDF, **pdfplumber** parses the physical document structure. If it's an HL7 message, **hl7apy** decodes the complex medical syntax into plain strings.
+2. **AI-Driven Named Entity Recognition (NER)**: The normalized raw text is passed to **spaCy** using the `en_core_web_lg` transformer model. This allows the system to understand the linguistic and grammatical context of the medical phrasing.
+3. **Precise PII Classification**: **Microsoft Presidio** analyzes the contextual tokens to classify sensitive entities (Names, Phone Numbers, Aadhaar, PAN, Locations). It maps out a definitive array of PII metadata containing the exact start/end indices of the sensitive text.
+4. **Zero-Knowledge Encrypted Storage**: The raw text is subjected to strict **Fernet symmetric encryption (AES-256)**. It is saved in the database alongside the JSON array of PII metadata. *The raw, readable text is never stored in plaintext.*
+5. **Contextual Policy Routing**: During a retrieval request, the `Policy Engine` authenticates the JWT token, cross-references the requested Role against the Purpose, checks explicit patient consent, and outputs a masking strategy (`ALLOW`, `PARTIAL_MASK`, or `DENY`).
+6. **Dynamic Anonymization**: If partial masking is approved, the **Presidio Anonymizer** intercepts the decrypted text and the exact PII metadata array, cleanly replacing isolated tokens (e.g., swapping actual numbers for `[PHONE_MASKED]`) before finally returning the safe payload to the frontend.
+
+---
+
+## 🛠️ Detailed Technology Stack
 
 <details>
 <summary><b>Frontend Layer (Next.js 14)</b></summary>
 <ul>
   <li><b>Framework</b>: Next.js 14 (App Router), React 18</li>
-  <li><b>UI/UX</b>: Tailwind CSS, Framer Motion (for fluid micro-interactions, spring transitions, and glassmorphism)</li>
-  <li><b>Icons</b>: Lucide React</li>
-  <li><b>Language</b>: TypeScript for strict type-safety across components.</li>
+  <li><b>UI/UX</b>: Tailwind CSS, Framer Motion (Driving fluid micro-interactions, spring transitions, and modern glassmorphism UI).</li>
+  <li><b>Icons</b>: Lucide React for consistent, scalable vector graphics.</li>
+  <li><b>Language</b>: TypeScript for strict compile-time type-safety bridging the frontend constraints.</li>
 </ul>
 </details>
 
 <details>
 <summary><b>Backend Core (Python 3.10+)</b></summary>
 <ul>
-  <li><b>API Framework</b>: FastAPI & Uvicorn (Asynchronous, lightning fast)</li>
-  <li><b>Security & Encryption</b>: <code>cryptography</code> (Fernet symmetric AES-256 encryption) and <code>passlib</code> / <code>python-jose</code> for JWT Auth & password hashing.</li>
-  <li><b>NLP & PII Detection</b>: <code>presidio-analyzer</code> & <code>presidio-anonymizer</code> (Microsoft Presidio) backed by <code>spaCy</code> (<code>en_core_web_lg</code> transformer-ready NLP model)</li>
-  <li><b>Database</b>: SQLite (built-in relational storage)</li>
+  <li><b>API Framework</b>: FastAPI & Uvicorn for asynchronous, lightning-fast robust networking.</li>
+  <li><b>Security & Encryption</b>: <code>cryptography</code> orchestrating Fernet symmetric AES-256 encryption. <code>passlib</code> and <code>python-jose</code> for secure PBKDF2 password hashing and stateless JWT Auth routing.</li>
+  <li><b>NLP & Logic Engine</b>: <code>presidio-analyzer</code> & <code>presidio-anonymizer</code> (Microsoft Presidio) forming the backbone of the classification system, heavily supported by <code>spaCy</code> (<code>en_core_web_lg</code> NLP transformer model).</li>
+  <li><b>Database Layer</b>: SQLite utilizing relational mapping for highly reliable local state storage.</li>
 </ul>
 </details>
 
 <details>
-<summary><b>Data Processing Ingestion Modules</b></summary>
+<summary><b>Data Processing Modules</b></summary>
 <ul>
-  <li><b>OCR</b>: <code>pytesseract</code> & <code>Pillow</code> & <code>Tesseract-OCR</code> for optical character recognition from medical scan images.</li>
-  <li><b>PDF Extraction</b>: <code>pdfplumber</code> for extracting structural text blocks from medical PDF reports.</li>
-  <li><b>Medical Syntax</b>: <code>hl7apy</code> for parsing medical Health Level Seven (HL7) messages.</li>
+  <li><b>Computer Vision/OCR</b>: <code>pytesseract</code> and <code>Pillow</code> interfacing with system-level <code>Tesseract-OCR</code> for optical abstraction of medical scans.</li>
+  <li><b>Document Parsing</b>: <code>pdfplumber</code> for pinpoint extraction of structural blocks inside medical PDF reports.</li>
+  <li><b>Medical Syntax Protocol</b>: <code>hl7apy</code> dedicated strictly to parsing legacy medical Health Level Seven (HL7) payloads.</li>
 </ul>
 </details>
 
@@ -280,8 +299,16 @@ MedGuardX is built with a **Privacy-by-Design** philosophy, adhering to global a
 
 ---
 
-## 📄 License
-MedGuardX is licensed under the MIT License. See `LICENSE` for more details.
+## 🤝 Acknowledgements
 
----
-*Built with ❤️ for secure healthcare by Adarsh.*
+Developed by **Adarsh Dwivedi**  
+📱 +91 9305597756  
+💻 [GitHub Profile](https://github.com/adarshcod30)  
+🔗 [LinkedIn Profile](https://linkedin.com/in/adarshcod30)  
+
+Adarsh is a passionate software engineer specializing in AI-driven enterprise applications and full-stack development. By integrating sophisticated large language models with reliable backend architectures, he focuses on building scalable autonomous systems that solve real-world problems.
+
+- **Microsoft Presidio & spaCy** for unlocking advanced programmatic reasoning and NLP mechanics at minimal latencies.
+- **FastAPI & Next.js** making stateful routing and asynchronous capabilities structurally sustainable.
+
+*Architected by Adarsh Dwivedi — MedGuardX*
