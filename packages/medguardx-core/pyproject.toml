@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "medguardx-core"
-version = "1.0.0"
+version = "1.0.1"
 description = "Context-aware PII/PHI detection and masking engine for healthcare data. Stateless, model-configurable, framework-agnostic."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -36,10 +36,10 @@ dependencies = [
 # The engine is model-agnostic: after install, choose any spaCy English pipeline
 # with `python -m spacy download en_core_web_{sm,md,lg,trf}` and pass its name to
 # EngineConfig(model=...). Model wheels are NOT declared as dependencies because
-# PyPI forbids direct-URL requirements and spaCy models are not on PyPI.
+# PyPI forbids direct-URL requirements and spaCy models are not on PyPI. The
+# transformer model (en_core_web_trf) pulls its own runtime (spacy-curated-
+# transformers + torch) when downloaded, so no transformer extra is needed.
 [project.optional-dependencies]
-# The transformer pipeline (en_core_web_trf) additionally needs spacy-transformers.
-trf = ["spacy-transformers>=1.3"]
 dev = ["pytest>=7", "pytest-cov>=4", "build>=1.0", "twine>=5.0"]
 
 [project.urls]

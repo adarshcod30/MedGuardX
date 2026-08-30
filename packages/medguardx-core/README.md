@@ -22,7 +22,7 @@ model-configurable, framework-agnostic Python engine. This is the reusable core 
 pip install medguardx-core
 python -m spacy download en_core_web_md   # recommended default
 # other options: en_core_web_sm (smallest) · en_core_web_lg (best statistical)
-# for the transformer model: pip install "medguardx-core[trf]" && python -m spacy download en_core_web_trf
+#                en_core_web_trf (transformer — pulls torch automatically)
 ```
 
 The engine is model-agnostic — install any spaCy English pipeline and pass its name

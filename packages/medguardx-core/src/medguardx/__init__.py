@@ -18,7 +18,7 @@ from .ingestion import ExtractionError, extract_text
 from .masking import mask_text
 from .policy import DEFAULT_RULES, PolicyEngine
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 __all__ = [
     "MedGuardEngine",
