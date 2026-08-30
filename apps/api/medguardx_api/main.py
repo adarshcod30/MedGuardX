@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from . import __version__
 from .config import get_settings
-from .routes import audit, auth, preview, retrieve, upload
+from .routes import audit, auth, maintenance, preview, retrieve, upload
 from .storage import store
 
 
@@ -43,7 +43,7 @@ def create_app() -> FastAPI:
         allow_headers=["Authorization", "Content-Type"],
     )
 
-    for module in (auth, upload, retrieve, preview, audit):
+    for module in (auth, upload, retrieve, preview, audit, maintenance):
         app.include_router(module.router)
 
     @app.get("/", tags=["health"])

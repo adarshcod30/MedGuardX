@@ -177,3 +177,22 @@ def get_stats() -> dict:
             "recent_uploads": count(schema.records),
             "recent_accesses": count(schema.access_logs),
         }
+
+
+def purge_all(keep_admin: bool = True) -> dict:
+    """Delete all patient data + logs, and (optionally non-admin) users.
+
+    Used by the admin maintenance endpoint to clear test/demo data. Deletes in
+    FK-safe order.
+    """
+    counts = {}
+    with _engine().begin() as conn:
+        for table in (schema.access_logs, schema.audit_logs, schema.records, schema.patients):
+            counts[table.name] = conn.execute(table.delete()).rowcount
+        if keep_admin:
+            counts["users"] = conn.execute(
+                schema.users.delete().where(schema.users.c.role != "admin")
+            ).rowcount
+        else:
+            counts["users"] = conn.execute(schema.users.delete()).rowcount
+    return counts
