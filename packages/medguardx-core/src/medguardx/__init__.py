@@ -14,6 +14,7 @@ from .config import DEFAULT_ENTITIES, EngineConfig
 from .detection import Detector, PIIEntity, resolve_overlaps
 from .engine import MedGuardEngine, ProcessResult
 from .enums import MaskingStrategy, Purpose, Role
+from .ingestion import ExtractionError, extract_text
 from .masking import mask_text
 from .policy import DEFAULT_RULES, PolicyEngine
 
@@ -29,6 +30,8 @@ __all__ = [
     "PolicyEngine",
     "DEFAULT_RULES",
     "DEFAULT_ENTITIES",
+    "ExtractionError",
+    "extract_text",
     "mask_text",
     "Role",
     "Purpose",

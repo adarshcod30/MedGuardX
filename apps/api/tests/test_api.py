@@ -98,3 +98,16 @@ def test_non_privileged_roles_still_register(client):
         r = _register(client, f"ok_{role}", role=role)
         assert r.status_code == 201, r.text
         assert r.json()["role"] == role
+
+
+def test_unreadable_image_is_rejected_not_stored(client):
+    # An invalid image (or one that needs OCR when tesseract is absent) must be
+    # rejected with 422, never stored as an "[OCR error: ...]" record.
+    tok = _register(client, "img_doc", role="doctor").json()["access_token"]
+    r = client.post(
+        "/api/upload",
+        headers=_auth(tok),
+        files={"file": ("scan.png", b"not a real image", "image/png")},
+    )
+    assert r.status_code == 422
+    assert "error" not in r.json().get("detail", "").lower()[:6]  # a helpful message, not a stack string

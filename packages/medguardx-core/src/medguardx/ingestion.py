@@ -11,6 +11,15 @@ import os
 from typing import Tuple
 
 
+class ExtractionError(RuntimeError):
+    """Raised when text cannot be extracted from an uploaded file.
+
+    Distinct from "no text found": this signals a real failure (corrupt file, a
+    missing OCR engine, etc.) so callers can reject the upload rather than
+    silently storing an error string as the record's content.
+    """
+
+
 def detect_file_type(filename: str, content: bytes) -> str:
     ext = os.path.splitext(filename or "")[1].lower()
     if ext in (".hl7", ".adt"):
@@ -33,7 +42,7 @@ def extract_text_from_pdf(content: bytes) -> str:
             pages = [page.extract_text() or "" for page in pdf.pages]
         return "\n".join(pages).strip()
     except Exception as exc:  # pragma: no cover - depends on optional dep
-        return f"[PDF extraction error: {exc}]"
+        raise ExtractionError(f"PDF extraction failed: {exc}") from exc
 
 
 def extract_text_from_image(content: bytes) -> str:
@@ -42,7 +51,10 @@ def extract_text_from_image(content: bytes) -> str:
 
         import pytesseract
         from PIL import Image
+    except Exception as exc:  # pragma: no cover - optional deps not installed
+        raise ExtractionError("OCR dependencies (pytesseract/Pillow) are not installed.") from exc
 
+    try:
         img = Image.open(io.BytesIO(content))
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as fh:
             img.save(fh.name)
@@ -50,8 +62,13 @@ def extract_text_from_image(content: bytes) -> str:
                 return pytesseract.image_to_string(fh.name).strip()
             finally:
                 os.unlink(fh.name)
+    except pytesseract.TesseractNotFoundError as exc:  # pragma: no cover
+        raise ExtractionError(
+            "OCR engine (tesseract) is not available in this deployment. "
+            "Image files are not supported here; use text, PDF, or HL7."
+        ) from exc
     except Exception as exc:  # pragma: no cover - depends on optional dep
-        return f"[OCR error: {exc}]"
+        raise ExtractionError(f"OCR failed: {exc}") from exc
 
 
 def parse_hl7(content: bytes) -> str:

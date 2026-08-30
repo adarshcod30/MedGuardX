@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Optional
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
-from medguardx.ingestion import extract_text
+from medguardx.ingestion import ExtractionError, extract_text
 
 from ..engine import get_engine
 from ..schemas import PIIEntityOut, UploadResponse
@@ -28,9 +28,19 @@ async def upload_file(
     if len(content) > MAX_BYTES:
         raise HTTPException(status_code=413, detail="File exceeds 10 MB limit")
 
-    extracted, file_type = extract_text(file.filename or "data.txt", content)
+    try:
+        extracted, file_type = extract_text(file.filename or "data.txt", content)
+    except ExtractionError as exc:
+        # A real extraction failure (corrupt file, OCR engine unavailable). Reject
+        # rather than storing the error text as if it were the record's content.
+        raise HTTPException(status_code=422, detail=str(exc))
+
     if not extracted.strip():
-        raise HTTPException(status_code=400, detail=f"Could not extract readable text from the {file_type} file.")
+        raise HTTPException(
+            status_code=422,
+            detail=f"No readable text found in the {file_type} file "
+                   "(it may be empty or, for a scanned document, contain no text layer).",
+        )
 
     entities = get_engine().detect(extracted)
 
