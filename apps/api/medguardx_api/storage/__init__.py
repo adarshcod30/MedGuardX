@@ -1,0 +1,1 @@
+"""MedGuardX API storage package."""

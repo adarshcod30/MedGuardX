@@ -1,18 +1,41 @@
+# Render blueprint: managed Postgres + the MedGuardX API.
+# The frontend deploys separately (e.g. Vercel) pointing NEXT_PUBLIC_API_URL here.
+
+databases:
+  - name: medguardx-db
+    plan: free
+    databaseName: medguardx
+    user: medguardx
+
 services:
   - type: web
     name: medguardx-backend
-    env: python
-    region: oregon
+    runtime: python
     plan: free
-    repo: https://github.com/adarshcod30/MedGuardX.git
+    region: oregon
     branch: main
-    rootDir: backend
-    buildCommand: "pip install -r requirements.txt && python -m spacy download en_core_web_sm"
-    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    # Built from the repo root so the core package is available to the API.
+    buildCommand: "pip install './packages/medguardx-core[md]' && pip install './apps/api[postgres]'"
+    startCommand: "uvicorn medguardx_api.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.0
-      - key: MEDGUARDX_KEY
+        value: "3.11.9"
+      - key: MEDGUARDX_ENVIRONMENT
+        value: production
+      - key: MEDGUARDX_MODEL
+        value: en_core_web_md
+      - key: MEDGUARDX_JWT_SECRET
         generateValue: true
-      - key: FRONTEND_URL
-        value: "https://your-vercel-domain.vercel.app" # Update this to your Vercel URL once deployed
+      # A valid Fernet key (urlsafe base64, 32 bytes). Generate once and set here:
+      #   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+      # Do NOT rotate it or existing encrypted records become unreadable.
+      - key: MEDGUARDX_FERNET_KEY
+        sync: false
+      - key: MEDGUARDX_DATABASE_URL
+        fromDatabase:
+          name: medguardx-db
+          property: connectionString
+      # Set to your deployed frontend origin(s), comma-separated. No wildcard in prod.
+      - key: MEDGUARDX_CORS_ORIGINS
+        value: "https://med-guard-x.vercel.app"

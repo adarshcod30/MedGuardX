@@ -1,8 +1,29 @@
-node_modules/
-.next/
+# Python
 __pycache__/
 *.pyc
 venv/
+.venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+testenv/
+
+# Node / Next
+node_modules/
+.next/
+out/
+
+# Data & secrets
 *.db
+*.db-wal
+*.db-shm
 .env
+!.env.example
+
+# OS / editor
 .DS_Store
+*.mov
+
+# TS build info
+*.tsbuildinfo
