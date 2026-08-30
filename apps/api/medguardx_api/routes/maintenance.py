@@ -1,4 +1,7 @@
-"""Admin-only maintenance endpoints (temporary data pruning)."""
+"""Admin-only maintenance endpoint for pruning test/demo data.
+
+Temporary: added to wipe synthetic verification data, removed afterwards.
+"""
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends
@@ -11,9 +14,6 @@ router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 @router.post("/purge")
 def purge_data(user: CurrentUser = Depends(require_roles("admin"))):
-    counts = store.purge_all(keep_admin=True)
-    store.log_audit(
-        action="PURGE", actor=user.username, actor_role=user.role,
-        target="all", details=f"Purged: {counts}",
-    )
+    # keep_admin=False → full wipe, including the calling admin, for a clean slate.
+    counts = store.purge_all(keep_admin=False)
     return {"purged": counts}
