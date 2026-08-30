@@ -122,7 +122,7 @@ export default function UploadPage() {
           border-2 border-dashed`}
       >
         <input type="file" id="fileInput" className="hidden" onChange={handleFileSelect}
-          accept=".txt,.hl7,.pdf,.png,.jpg,.jpeg,.tiff,.bmp" />
+          accept=".txt,.hl7,.pdf" />
         <label htmlFor="fileInput" className="cursor-pointer">
           <motion.div
             animate={dragOver ? { scale: 1.1, rotate: 5 } : { scale: 1, rotate: 0 }}
@@ -133,12 +133,11 @@ export default function UploadPage() {
           <p className="text-lg font-semibold text-surface-800">
             {dragOver ? 'Drop file here' : 'Drag & drop or click to upload'}
           </p>
-          <p className="text-sm text-surface-400 mt-2">Supports HL7, PDF, PNG, JPG, TXT</p>
+          <p className="text-sm text-surface-400 mt-2">Supports HL7, PDF, and Text</p>
           <div className="flex justify-center gap-3 mt-4">
             {[
               { icon: '🏥', label: 'HL7' },
               { icon: '📄', label: 'PDF' },
-              { icon: '🖼️', label: 'Image' },
               { icon: '📝', label: 'Text' },
             ].map(f => (
               <span key={f.label} className="px-3 py-1.5 rounded-lg bg-surface-100 text-xs font-medium text-surface-600">
@@ -147,6 +146,11 @@ export default function UploadPage() {
             ))}
           </div>
         </label>
+        <p className="text-xs text-surface-400 mt-5 max-w-md mx-auto">
+          Note: image OCR is not available on this hosted demo (the server has no OCR engine).
+          Please upload text, PDF, or HL7 files. Image support requires a self-hosted deployment
+          with Tesseract installed.
+        </p>
       </motion.div>
 
       {/* Processing Pipeline */}
