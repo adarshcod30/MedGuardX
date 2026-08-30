@@ -1,7 +1,7 @@
 """API tests -- the security fixes are the headline assertions here."""
 from __future__ import annotations
 
-from tests.conftest import _register
+from tests.conftest import _admin_token, _register
 
 
 def _auth(token):
@@ -60,7 +60,7 @@ def test_audit_requires_privileged_role(client):
     patient_tok = _register(client, "pat1", role="patient").json()["access_token"]
     assert client.get("/api/audit", headers=_auth(patient_tok)).status_code == 403
 
-    admin_tok = _register(client, "admin1", role="admin").json()["access_token"]
+    admin_tok = _admin_token(client)  # seeded admin, not via /register
     assert client.get("/api/audit", headers=_auth(admin_tok)).status_code == 200
 
 
@@ -77,8 +77,24 @@ def test_login_wrong_password_rejected(client):
 
 
 def test_audit_trail_attributes_real_actor(client):
-    tok = _register(client, "auditor", role="admin").json()["access_token"]
+    # A doctor may view audit and its actions are attributed to them.
+    tok = _register(client, "auditor", role="doctor").json()["access_token"]
     client.post("/api/preview", headers=_auth(tok), json={"text": "hello", "purpose": "research"})
     logs = client.get("/api/audit", headers=_auth(tok)).json()["logs"]
     preview_logs = [l for l in logs if l["action"] == "PREVIEW"]
     assert preview_logs and preview_logs[0]["actor"] == "auditor"  # not user_id=0 anymore
+
+
+def test_cannot_self_register_as_admin(client):
+    r = client.post("/api/register", json={
+        "username": "wannabe_admin", "password": "password123", "role": "admin",
+    })
+    assert r.status_code == 403
+    assert "admin" in r.json()["detail"].lower()
+
+
+def test_non_privileged_roles_still_register(client):
+    for role in ("patient", "doctor", "nurse", "researcher", "company"):
+        r = _register(client, f"ok_{role}", role=role)
+        assert r.status_code == 201, r.text
+        assert r.json()["role"] == role

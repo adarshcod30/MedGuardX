@@ -14,6 +14,9 @@ os.environ.update(
     MEDGUARDX_FERNET_KEY="dGVzdC1mZXJuZXQta2V5LTMyLWJ5dGVzLWxvbmchISE=",
     MEDGUARDX_DATABASE_URL=f"sqlite:///{_TMPDB.name}",
     MEDGUARDX_CORS_ORIGINS="http://localhost:3000",
+    # Seeded admin -- the supported way to get an admin now that /register refuses it.
+    MEDGUARDX_ADMIN_USERNAME="seed_admin",
+    MEDGUARDX_ADMIN_PASSWORD="seedadminpass123",
 )
 
 
@@ -65,3 +68,9 @@ def _register(client, username, role="doctor", password="password123"):
         "/api/register",
         json={"username": username, "password": password, "role": role, "full_name": username},
     )
+
+
+def _admin_token(client):
+    """Log in as the seeded admin (admin can't be created via /register)."""
+    r = client.post("/api/login", json={"username": "seed_admin", "password": "seedadminpass123"})
+    return r.json()["access_token"]

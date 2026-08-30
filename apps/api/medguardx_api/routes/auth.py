@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
+from medguardx import Role
 
 from ..schemas import LoginRequest, RegisterRequest, TokenResponse
 from ..security import create_access_token, hash_password, verify_password
@@ -9,9 +10,18 @@ from ..storage import store
 
 router = APIRouter(prefix="/api", tags=["auth"])
 
+# Roles a member of the public may self-assign at signup. Privileged roles
+# (currently ADMIN) are provisioned out-of-band, never granted by registration.
+SELF_REGISTERABLE_ROLES = {Role.PATIENT, Role.DOCTOR, Role.NURSE, Role.RESEARCHER, Role.COMPANY}
+
 
 @router.post("/register", response_model=TokenResponse, status_code=201)
 def register(body: RegisterRequest):
+    if body.role not in SELF_REGISTERABLE_ROLES:
+        # Prevents privilege escalation: nobody can hand themselves an admin
+        # token through the public signup endpoint.
+        raise HTTPException(status_code=403, detail=f"Role '{body.role.value}' cannot be self-registered.")
+
     if store.get_user_by_username(body.username):
         raise HTTPException(status_code=409, detail="Username already exists")
 

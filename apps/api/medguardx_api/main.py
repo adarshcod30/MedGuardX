@@ -12,9 +12,30 @@ from .routes import audit, auth, preview, retrieve, upload
 from .storage import store
 
 
+def _seed_admin() -> None:
+    """Create the configured admin account at startup if it doesn't exist.
+
+    The only supported way to provision an admin -- signup can't grant the role.
+    """
+    settings = get_settings()
+    if not (settings.admin_username and settings.admin_password):
+        return
+    if store.get_user_by_username(settings.admin_username):
+        return
+    from .security import hash_password
+
+    store.create_user(
+        username=settings.admin_username,
+        password_hash=hash_password(settings.admin_password),
+        role="admin",
+        full_name="Administrator",
+    )
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     store.init_db()
+    _seed_admin()
     # Warm the model so the first request isn't slow. Best-effort: a missing model
     # should surface clearly rather than crash startup.
     try:

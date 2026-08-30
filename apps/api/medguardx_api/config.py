@@ -35,6 +35,12 @@ class Settings(BaseSettings):
     # NLP model used by the engine.
     model: str = Field(default="en_core_web_md")
 
+    # Optional admin seed. When both are set, an admin account is created at
+    # startup if it doesn't already exist. This is the ONLY way to mint an admin
+    # -- the public /register endpoint refuses privileged roles.
+    admin_username: str = Field(default="")
+    admin_password: str = Field(default="")
+
     # CORS: comma-separated allowlist string. "*" is rejected in production.
     # Kept as a plain string so env parsing stays simple; use `cors_origins`.
     cors_origins_raw: str = Field(default="http://localhost:3000", alias="MEDGUARDX_CORS_ORIGINS")
