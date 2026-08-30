@@ -27,3 +27,6 @@ out/
 
 # TS build info
 *.tsbuildinfo
+
+# Local config
+.claude/
