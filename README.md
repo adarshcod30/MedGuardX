@@ -171,7 +171,8 @@ Strategies: `full_access` · `partial_mask` (minimal safe hint) · `full_anonymi
 ### A. Use the engine in your own code
 
 ```bash
-pip install "packages/medguardx-core[md]"     # or [sm] / [lg] / [trf]
+pip install medguardx-core                    # from PyPI
+python -m spacy download en_core_web_md        # or sm / lg / trf
 ```
 
 ```python
@@ -189,7 +190,8 @@ See [packages/medguardx-core/README.md](packages/medguardx-core/README.md) for t
 
 ```bash
 # --- API (terminal 1) ---
-pip install "./packages/medguardx-core[md]" "./apps/api[dev]"
+pip install "./packages/medguardx-core" "./apps/api[dev]"
+python -m spacy download en_core_web_md
 cp apps/api/.env.example apps/api/.env       # fill in the two secrets it describes
 cd apps/api && uvicorn medguardx_api.main:app --reload --port 8000
 #   api  → http://localhost:8000/docs

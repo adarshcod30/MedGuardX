@@ -9,14 +9,21 @@ description = "Context-aware PII/PHI detection and masking engine for healthcare
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "Apache-2.0" }
-authors = [{ name = "Adarsh Dwivedi" }]
+authors = [{ name = "Adarsh Dwivedi", email = "23ucs509@lnmiit.ac.in" }]
 keywords = ["pii", "phi", "healthcare", "masking", "anonymization", "presidio", "hipaa", "dpdp", "gdpr"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Security",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Text Processing :: Linguistic",
 ]
 
@@ -26,26 +33,19 @@ dependencies = [
     "spacy>=3.7,<3.9",
 ]
 
-# The masking engine itself is model-agnostic. The spaCy model is chosen by the
-# integrator via an extra so nothing heavy is pulled in by default. Our own
-# deployment uses [md]; anyone can pick sm / md / lg / trf.
+# The engine is model-agnostic: after install, choose any spaCy English pipeline
+# with `python -m spacy download en_core_web_{sm,md,lg,trf}` and pass its name to
+# EngineConfig(model=...). Model wheels are NOT declared as dependencies because
+# PyPI forbids direct-URL requirements and spaCy models are not on PyPI.
 [project.optional-dependencies]
-sm = ["en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl"]
-md = ["en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl"]
-lg = ["en_core_web_lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.8.0/en_core_web_lg-3.8.0-py3-none-any.whl"]
-trf = [
-    "en_core_web_trf @ https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl",
-    "spacy-transformers>=1.3",
-]
-dev = ["pytest>=7", "pytest-cov>=4"]
+# The transformer pipeline (en_core_web_trf) additionally needs spacy-transformers.
+trf = ["spacy-transformers>=1.3"]
+dev = ["pytest>=7", "pytest-cov>=4", "build>=1.0", "twine>=5.0"]
 
 [project.urls]
 Homepage = "https://github.com/adarshcod30/MedGuardX"
 Repository = "https://github.com/adarshcod30/MedGuardX"
-
-[tool.hatch.metadata]
-# The model extras reference spaCy model wheels by direct URL.
-allow-direct-references = true
+Issues = "https://github.com/adarshcod30/MedGuardX/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/medguardx"]

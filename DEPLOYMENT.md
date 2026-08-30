@@ -33,7 +33,7 @@ Postgres instance and a Python web service built straight from source.
 
 | Setting | Value | Why |
 |---|---|---|
-| `buildCommand` | `pip install './packages/medguardx-core[md]' && pip install './apps/api[postgres]'` | Installs the engine (with the `md` model) then the API, from the repo root |
+| `buildCommand` | `pip install './packages/medguardx-core' && python -m spacy download en_core_web_md && pip install './apps/api[postgres]'` | Installs the engine, downloads the `md` model, then the API, from the repo root |
 | `startCommand` | `uvicorn medguardx_api.main:app --host 0.0.0.0 --port $PORT` | Native ASGI server |
 | `healthCheckPath` | `/health` | Render waits for the app (and model) to be ready |
 | `MEDGUARDX_ENVIRONMENT` | `production` | Enforces secrets + non-wildcard CORS at startup |
@@ -103,3 +103,36 @@ end to end.
 | `MEDGUARDX_DATABASE_URL` | ✅ | Injected from Render Postgres; `postgres://` is auto-normalized to `postgresql+psycopg://` |
 | `MEDGUARDX_MODEL` | — | `en_core_web_sm/md/lg/trf` |
 | `MEDGUARDX_CORS_ORIGINS` | ✅ | Comma-separated allowlist; no `*` |
+
+---
+
+## 4. Publishing `medguardx-core` to PyPI
+
+The OSS engine publishes via **PyPI Trusted Publishing** (OIDC) — no API token or
+secret is stored. The workflow is [`.github/workflows/publish-pypi.yml`](.github/workflows/publish-pypi.yml).
+
+### One-time setup
+
+1. Create a PyPI account (https://pypi.org).
+2. Add a **pending trusted publisher**: https://pypi.org/manage/account/publishing/
+   - PyPI Project Name: `medguardx-core`
+   - Owner: `adarshcod30`
+   - Repository name: `MedGuardX`
+   - Workflow name: `publish-pypi.yml`
+   - Environment name: *(leave blank)*
+
+### Publish a release
+
+Create a GitHub Release (e.g. tag `v1.0.0`) — the workflow builds and publishes
+automatically. Or trigger it manually from the Actions tab (`workflow_dispatch`).
+
+### Manual alternative (local, needs your own PyPI token)
+
+```bash
+cd packages/medguardx-core
+python -m build
+python -m twine upload dist/*        # prompts for your PyPI API token
+```
+
+Bump `version` in `packages/medguardx-core/pyproject.toml` for every release —
+PyPI does not allow re-uploading the same version.
